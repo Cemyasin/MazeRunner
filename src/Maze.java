@@ -1,4 +1,3 @@
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -12,15 +11,20 @@ import java.util.Stack;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Maze extends JPanel implements ActionListener{
+public class Maze extends JPanel implements ActionListener {
+
+	Stack<Point> stack = new Stack<>();
+	Stack<Integer> stack2 = new Stack<>();
+	Stack<Point> stack3 = new Stack<>();
+
 	private int width, height, rectWidth, rectHeight;
 	private boolean[][] maze;
-	
-	 Stack<Point> stack = new Stack<>();
-	Stack<Integer> stack2 = new Stack<>();
 	static Point current;
-	boolean flag=false;
-	
+	boolean flag = false;
+	private boolean solution = false, clear = false;
+
+	Timer timer = new Timer(1, this);
+
 	public Maze(int width, int height) {
 		// Make dimensions odd
 		width -= width % 2;
@@ -31,14 +35,13 @@ public class Maze extends JPanel implements ActionListener{
 		this.width = width;
 		this.height = height;
 		maze = new boolean[height][width];
-		
-//		Timer timer= new Timer(10, this);
-//		timer.start();
+
 	}
-	
+
 	public int[][] generate() {
-		
-	int[][] mazee = new int[height][width];
+
+		clear = false;
+		int[][] mazee = new int[height][width];
 		// Initialize maze
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
@@ -74,180 +77,162 @@ public class Maze extends JPanel implements ActionListener{
 		maze[height - 1][width - 2] = false;
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
-				  if( maze[i][j])
-					  mazee[i][j]=1; 
-				  else
-					  mazee[i][j]=0;
+				if (maze[i][j])
+					mazee[i][j] = 1;
+				else
+					mazee[i][j] = 0;
 			}
 		}
 //		mazee[0][0] =0;
 		mazee[height - 1][width - 2] = 9;
-	
+
 		return mazee;
 	}
-	ArrayList<Integer> x1= new ArrayList<>();
-	ArrayList<Integer> y1= new ArrayList<>();
-	Timer timer= new Timer(1,this);
 
-	
-	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
-
-		// setBackground(Color.BLACK);S
 
 		// Calculate dimensions of rectangles
 		rectWidth = getWidth() / width;
 		rectHeight = getHeight() / height;
 
-		// Draw maze
-		// g.setColor(Color.WHITE);
-//		if(!flag) {
+		if (!clear) {
 			for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				if (!maze[i][j]) {
+				for (int j = 0; j < width; j++) {
+					if (!maze[i][j]) {
+						g.setColor(new Color(70, 78, 91));
+						g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+
+						// g.drawRect(j * rectWidth, i * rectHeight, j, i);
+					} else {
+						g.setColor(new Color(0, 0, 0));
+						g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+					}
+					g.setColor(Color.BLACK);
+					g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+				}
+
+			}
+
+			repaint();
+
+			if (flag) {
+				g.setColor(Color.GREEN);
+				g.fillRect(0, 0, rectWidth, rectHeight);
+				g.setColor(Color.RED);
+				g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
+
+				for (int i = 0; i < stack3.size() - 1; i++) {
+					g.setColor(Color.MAGENTA);
+					g.fillRect(stack3.get(i).x * rectWidth, stack3.get(i).y * rectHeight, rectWidth, rectHeight);
+
+					g.setColor(Color.BLACK);
+					g.drawRect(stack3.get(i).x * rectWidth, stack3.get(i).y * rectHeight, rectWidth, rectHeight);
+					repaint();
+
+				}
+
+			}
+
+			// Draw start and finish
+			if (solution) {
+				for (int j = 0; j < stack.size(); j++) {
+					g.setColor(Color.GREEN);
+					g.fillRect(rectWidth * stack.get(j).x, rectHeight * stack.get(j).y, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(rectWidth * stack.get(j).x, rectHeight * stack.get(j).y, rectWidth, rectHeight);
+
+					repaint();
+				}
+			}
+		} else {
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+
 					g.setColor(new Color(70, 78, 91));
 					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
 
-					// g.drawRect(j * rectWidth, i * rectHeight, j, i);
-				} else {
-					g.setColor(new Color(0,0,0));
-					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-				}
-			g.setColor(Color.BLACK);
-				g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-			}
-			g.setColor(new Color(70, 78, 91));
-			g.fillRect(0, 0, rectWidth, rectHeight);
-			g.setColor(Color.RED);
-			g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
-			
-		}
-//		}
-		
-		
-		 repaint();
-		 
-		 if(flag) {
-			 
-			 
-			 for(int i=0;i<x1.size();i++) {
-				  g.setColor(Color.MAGENTA);
-					g.fillRect(x1.get(i) * rectWidth, y1.get(i) *rectHeight, rectWidth, rectHeight);
-					
 					g.setColor(Color.BLACK);
-					g.drawRect(x1.get(i) * rectWidth, y1.get(i) *rectHeight, rectWidth, rectHeight);
-					 repaint();
-					 
-					 new Thread(new Runnable() {
-				            @Override
-				            public void run() {
-				                try {
-				                	
-				                	
-				                    Thread.sleep(1000);
-				                  
-									
-									
-				                } catch (InterruptedException ex) {
-				                    ex.printStackTrace();
-				                }
-				            }
-				        }).start();
-					
-					
-			 }
-		
-		 }
-			 
-		
-		
-//		for( i=0;i<Solver.stack2.size();i++) {
-//			
-//			 	 g.setColor(Color.LIGHT_GRAY);
-//			 g.fillRect(rectWidth*Solver.stack2.get(i).x, rectHeight*Solver.stack2.get(i).y, rectWidth, rectHeight);
-////			 try {
-////				Thread.sleep(500);
-////			} catch (InterruptedException e) {
-////				// TODO Auto-generated catch block
-////				e.printStackTrace();
-////			}
-////			 timer.start();
-//			
-//			repaint(); }
-		
-		// Draw start and finish	
-//      for(int j =0;j<Solver.stack.size();j++) {
-//    	   g.setColor(Color.GREEN);
-//	       g.fillRect(rectWidth*Solver.stack.get(j).x, rectHeight*Solver.stack.get(j).y, rectWidth, rectHeight);
-//		
-////		 timer.start();
-//		 repaint();
-//      }
-	 	
-     
+					g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+				}
+
+			}
+			repaint();
+
+		}
 
 	}
-	int k=0;
-	  @Override
+
+	Thread thread;
+
+	@Override
 	public void actionPerformed(ActionEvent e) {
-		  x1.add(0, 0);
-		  y1.add(0, 0);
-		  
-		  if(flag) { 
-			 for(int i=0, j=0;i<stack2.size();i++,j++) {
-				// System.out.println(stack2.get(i));
-				 x1.add(j,this.stack2.get(i++) ) ;
-				 y1.add(j,this.stack2.get(i));  
-				 
-		
-			
-			repaint();
-			
-			
-			
-			  } 
-			 
-		  }
-		  
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while (!flag) {
+						for (int i = 0, j = 0; i < stack2.size(); i++, j++) {
+							// System.out.println(stack2.get(i));
+							stack3.push(new Point(stack2.get(i++), stack2.get(i)));
+							repaint();
+							thread.sleep(50);
+						}
+
+					}
+
+				} catch (InterruptedException ex) {
+					flag = false;
+				}
+			}
+		}).start();
+
 	}
-	  	
-	public  boolean solve(int[][] maze, int x, int y,boolean flag) throws InterruptedException {
+
+	public void getSolution() {
+		flag = false;
+		solution = true;
+
+	}
+
+	public void remove() {
+		clear = true;
+		solution=false;
+		stack = new Stack<>();
+		stack2 = new Stack<>();
+		stack3 = new Stack<>();
+	}
+
+	public boolean solve(int[][] maze, int x, int y, boolean flag) throws InterruptedException {
 		rectHeight = y;
 		rectWidth = x;
-		
-		Point point = new Point(y, x);
-		
-		
-		
-		
-		
 
-//		System.out.println(maze[y][x]);
+		Point point = new Point(y, x);
+
 		if (maze[y][x] == 9) {
 			point.x = x;
 			point.y = y;
-			this.flag=flag;
+			this.flag = flag;
 			stack.push(point);
 			return true;
 		}
 
 		if (maze[y][x] == 0) {
-			current=new Point();
+			current = new Point();
 			current.x = x;
 			current.y = y;
 //			tm.start();
 			stack2.push(x);
 			stack2.push(y);
 			System.out.println(stack2);
-			//Thread.sleep(500);
+			// Thread.sleep(500);
 			maze[y][x] = 2;
 
 			int dx = -1;
 			int dy = 0;
 			if (x != 0)
-				if (solve(maze, x + dx, y + dy,flag)) {
+				if (solve(maze, x + dx, y + dy, flag)) {
 					point.x = x;
 					point.y = y;
 					stack.push(point);
@@ -256,7 +241,7 @@ public class Maze extends JPanel implements ActionListener{
 
 			dx = 1;
 			dy = 0;
-			if (solve(maze, x + dx, y + dy,flag)) {
+			if (solve(maze, x + dx, y + dy, flag)) {
 				point.x = x;
 				point.y = y;
 				stack.push(point);
@@ -266,7 +251,7 @@ public class Maze extends JPanel implements ActionListener{
 			dx = 0;
 			dy = -1;
 			if (y != 0)
-				if (solve(maze, x + dx, y + dy,flag)) {
+				if (solve(maze, x + dx, y + dy, flag)) {
 					point.x = x;
 					point.y = y;
 					stack.push(point);
@@ -275,7 +260,7 @@ public class Maze extends JPanel implements ActionListener{
 
 			dx = 0;
 			dy = 1;
-			if (solve(maze, x + dx, y + dy,flag)) {
+			if (solve(maze, x + dx, y + dy, flag)) {
 				point.x = x;
 				point.y = y;
 				stack.push(point);
@@ -285,7 +270,5 @@ public class Maze extends JPanel implements ActionListener{
 
 		return false;
 	}
-
-
 
 }
