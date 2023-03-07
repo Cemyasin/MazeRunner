@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
@@ -16,7 +17,7 @@ public class frmMain extends JFrame {
 	private JPanel contentPane;
 	private Maze maze;
 	private JPanel panel ;
-
+	private int[][] mazeArray;
 	
 	/**
 	 * Launch the application.
@@ -40,6 +41,7 @@ public class frmMain extends JFrame {
 	public frmMain() {
 		int width=40;		
 		int height=40;
+		mazeArray=new int[height+1][width+1];
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 850);
@@ -57,13 +59,37 @@ public class frmMain extends JFrame {
 		JButton btnGenerate = new JButton("Generate");
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				maze.generate();		
+			mazeArray=maze.generate();		
 			}
 		});
 		btnGenerate.setBounds(834, 139, 123, 41);
 		contentPane.add(btnGenerate);
 		
 		JButton btnAnimation = new JButton("Animation");
+		btnAnimation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+//				Solver solver= new Solver(mazeArray,width,height);
+				try {
+					maze.solve(mazeArray, 1, 0,true);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//panel=solver;
+//				panel.updateUI();
+//				repaint();
+//				try {
+//					solver.solve(mazeArray, 1, 0);
+//				} catch (InterruptedException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//				
+//				int x=solver.stack.size();
+//				for(int i=0;i<x;i++)
+//				System.out.println(solver.stack.pop());
+			}
+		});
 		btnAnimation.setBounds(834, 200, 123, 41);
 		contentPane.add(btnAnimation);
 		
@@ -74,11 +100,9 @@ public class frmMain extends JFrame {
 		JButton btnClear = new JButton("Clear");
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panel= new JPanel();
-				panel = maze;
-				panel.setBounds(10, 30, 784, 770);
-				contentPane.add(panel);
-				repaint();
+				panel.removeAll(); // Panelin içeriğini temizleme
+		        panel.revalidate(); // Paneli yeniden boyutlandırma ve yeniden yerleştirme
+		        panel.repaint(); // Paneli yeniden çizme
 			}
 		});
 		btnClear.setBounds(834, 300, 123, 41);
@@ -86,113 +110,7 @@ public class frmMain extends JFrame {
 		
 		
 	}
-}
-class Maze extends JPanel {
-	private int width, height, rectWidth, rectHeight;
-	private boolean[][] maze;
 	
-	public Maze(int width, int height) {
-		// Make dimensions odd
-		width -= width % 2;
-		width++;
-		height -= height % 2;
-		height++;
-
-		this.width = width;
-		this.height = height;
-		maze = new boolean[height][width];
-	}
-	
-	public int[][] generate() {
-		
-	int[][] mazee = new int[height][width];
-		// Initialize maze
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				maze[i][j] = !(i % 2 == 1 && j % 2 == 1);
-			}
-		}
-
-		// Generate maze
-		Random random = new Random();
-		for (int k = 1; k < width; k += 2) {
-			for (int m = 1; m < height; m += 2) {
-				boolean south = random.nextInt(2) == 1;
-
-				if (m == height - 2) {
-					south = false;
-				}
-				if (k == width - 2) {
-					south = true;
-				}
-				if (k == width - 2 && m == height - 2) {
-					break;
-				}
-
-				if (south) {
-					maze[m + 1][k] = false;
-				} else {
-					maze[m][k + 1] = false;
-				}
-			}
-		}
-
-		maze[0][1] = false;
-		maze[height - 1][width - 2] = false;
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				  if( maze[i][j])
-					  mazee[i][j]=1; 
-				  else
-					  mazee[i][j]=0;
-			}
-		}
-		mazee[0][1] = 5;
-		mazee[height - 1][width - 2] = 9;
-	
-		return mazee;
-	}
-
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		// setBackground(Color.BLACK);S
-
-		// Calculate dimensions of rectangles
-		rectWidth = getWidth() / width;
-		rectHeight = getHeight() / height;
-
-		// Draw maze
-		// g.setColor(Color.WHITE);
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				if (!maze[i][j]) {
-					g.setColor(new Color(70, 78, 91));
-					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-
-					// g.drawRect(j * rectWidth, i * rectHeight, j, i);
-				} else {
-					g.setColor(new Color(0,0,0));
-					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-				}
-			g.setColor(Color.BLACK);
-				g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-			}
-			g.setColor(new Color(70, 78, 91));
-			g.fillRect(0, 0, rectWidth, rectHeight);
-			g.setColor(Color.RED);
-			g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
-		}
-		
-	
-		
-
-		// Draw start and finish
-		
-		
-		g.setColor(Color.GREEN);
-		g.fillOval(0, 0, rectWidth, rectHeight);
-		repaint();
-	}
 
 }
 
