@@ -1,6 +1,7 @@
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -8,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Color;
 import javax.swing.JTextField;
 
@@ -22,6 +24,7 @@ public class frmMain extends JFrame {
 	private JTextField textField_1;
 	int width = 40;
 	int height = 40;
+	private long time;
 
 	/**
 	 * Launch the application.
@@ -60,6 +63,18 @@ public class frmMain extends JFrame {
 		panel.setBounds(10, 30, 784, 770);
 		contentPane.add(panel);
 
+		textField = new JTextField();
+		textField.setOpaque(false);
+		textField.setBounds(818, 477, 156, 32);
+		contentPane.add(textField);
+		textField.setColumns(10);
+
+		textField_1 = new JTextField();
+		textField_1.setOpaque(false);
+		textField_1.setBounds(818, 534, 156, 32);
+		contentPane.add(textField_1);
+		textField_1.setColumns(10);
+
 		JButton btnGenerate = new JButton("Generate");
 		btnGenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -67,30 +82,38 @@ public class frmMain extends JFrame {
 				mazeArray = maze.generate();
 			}
 		});
-		btnGenerate.setBounds(837, 241, 123, 41);
+		btnGenerate.setBounds(839, 191, 123, 41);
 		contentPane.add(btnGenerate);
 
 		JButton btnAnimation = new JButton("Animation");
 		btnAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					long start = System.nanoTime();
 					maze.solve(mazeArray, 1, 0, true);
+					long finish = System.nanoTime();
+					time = (finish - start) / 1000000;
+					System.out.println(time);
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
 
 			}
 		});
-		btnAnimation.setBounds(837, 302, 123, 41);
+		btnAnimation.setBounds(839, 252, 123, 41);
 		contentPane.add(btnAnimation);
-
+		textField.setText("Solving Time : ");
+		textField_1.setText("Number of Steps : ");
 		JButton btnNewSolve = new JButton("Solve");
 		btnNewSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				maze.getSolution();
+				textField.setText("Solving Time : " + time + "ms");
+				textField_1.setText("Number of Steps : " + maze.truePath.size());
+
 			}
 		});
-		btnNewSolve.setBounds(837, 352, 123, 41);
+		btnNewSolve.setBounds(839, 302, 123, 41);
 		contentPane.add(btnNewSolve);
 
 		JButton btnClear = new JButton("Clear");
@@ -100,10 +123,44 @@ public class frmMain extends JFrame {
 				panel.removeAll(); // Panelin içeriğini temizleme
 				panel.revalidate(); // Paneli yeniden boyutlandırma ve yeniden yerleştirme
 				panel.repaint(); // Paneli yeniden çizme
+				textField.setText("Solving Time : ");
+				textField_1.setText("Number of Steps : ");
 			}
 		});
-		btnClear.setBounds(837, 402, 123, 41);
+		btnClear.setBounds(839, 352, 123, 41);
 		contentPane.add(btnClear);
+
+		JButton btnLogging = new JButton("Logging");
+		btnLogging.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StringBuilder builder = new StringBuilder();
+
+				for (int i = 0; i < mazeArray.length; i++) {
+					builder.append("{");
+					for (int j = 0; j < mazeArray[0].length; j++) {
+						builder.append(mazeArray[i][j] + ",");
+					}
+					builder.append("} ");
+					builder.append("\n");
+				}
+				builder.append("\n\n\n\n");
+				builder.append("----------Solution---------- \n");
+				builder.append("Step Number : " + maze.truePath.size());
+				builder.append("\n");
+				builder.append("Solition Time : " + time+"ms");
+				builder.append("\n");
+				for (Point is : maze.truePath) {
+					builder.append("(" + is.y + "," + is.x + ")" + "=>");
+				}
+
+				String data = builder.toString();
+				Logging logging = new Logging();
+				logging.log(data);
+
+			}
+		});
+		btnLogging.setBounds(839, 413, 123, 41);
+		contentPane.add(btnLogging);
 
 	}
 }

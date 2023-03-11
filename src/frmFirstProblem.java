@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,8 +21,8 @@ public class frmFirstProblem extends JFrame {
 	private JTextField textField;
 	JPanel panel = new JPanel();
 	firstMaze m;
-	int[][] matrix = null;
-
+//	int[][] matrix = null;
+	 int[][] absMaze=null;
 	/**
 	 * Launch the application.
 	 */
@@ -69,54 +70,79 @@ public class frmFirstProblem extends JFrame {
 		JButton btnGo = new JButton("Go");
 		btnGo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String uurl = textField.getText();
-				String url1 = "http://bilgisayar.kocaeli.edu.tr/prolab2/url1.txt";
-				String url2 = "http://bilgisayar.kocaeli.edu.tr/prolab2/url2.txt";
-				URL url;
-				char[][] input = new char[20][20];
-				try {
-					url = new URL(uurl);
-					BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-					String inputLine;
-
-					int i = 0, j = 0, k = 0;
-					boolean flag = true;
-					while ((inputLine = in.readLine()) != null) {
-						if (flag) {
-							input = new char[inputLine.length()][inputLine.length()];
-							matrix = new int[input.length + 4][input.length + 4];
-							flag = false;
-						}
-						input[i] = inputLine.toCharArray();
-
-						System.out.println(input[i]);
-						i++;
-					}
-
-					in.close();
-				} catch (MalformedURLException e1) {
+				ArrayList<Integer> mazeList = new ArrayList();	
+				URL url ; 
+		        BufferedReader read ; 
+		        String line;
+		        int arrayY=0,arrayX=0;
+		        String uurl = textField.getText();
+		        
+		        try {
+					url= new URL(uurl);
+			
+		          read= new BufferedReader(
+				        new InputStreamReader(url.openStream()));
+		        
+		        
+		        while ((line = read.readLine()) != null){
+		        	for(int j=0; j<line.length();j++) {
+//		        		System.out.println(Integer.parseInt(String.valueOf(line.charAt(j))));
+		        		mazeList.add(Integer.parseInt(String.valueOf(line.charAt(j))));
+		        		arrayY = line.length();
+		        	}
+		        	arrayX+=1;
+		        }
+		        
+		        read.close();
+		        
+		        } catch (MalformedURLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				for (int i = 0; i < input.length + 4; i++) {
-					for (int j = 0; j < input[0].length + 4; j++) {
-						if (i == 0 || j == 0 || i == input.length + 3 || j == input.length + 3) {
-							matrix[i][j] = 1;
-							continue;
-						}
-						if (i == 1 || j == 1) {
-							matrix[i][j] = 0;
-							continue;
-						}
-						if (i < input.length + 2 && j < input.length + 2)
-							matrix[i][j] = Character.getNumericValue(input[i - 2][j - 2]);
-					}
+		      
+		        
 
-				}
+		        
+		        int[][] maze = new int[arrayX][arrayY];
+		        int counter=0;
+		        
+		        for(int i=0; i<mazeList.size();i++) {
+//		        	System.out.println(mazeList.get(i));
+		        }
+		        
+		        for(int j=0;j<arrayX;j++) {
+		    		for(int k=0;k<arrayY;k++) {
+		    			maze[j][k] = mazeList.get(counter);
+		    			counter++;
+		    		}
+		    	}
+		        
+		        absMaze = new int[arrayX+2][arrayY+2];
+		        
+		        for(int i=0;i<arrayX+2;i++) {
+		        	for(int j=0;j<arrayY+2;j++) {
+		        		if((i==0 || i==arrayX+1) || (j==0 || j==arrayY+1)) {
+		        			absMaze[i][j] = 1;
+		        		}
+		        	}
+		        }
+		        
+		        for(int i=0;i<arrayX;i++) {
+		        	for(int j=0;j<arrayY;j++) {
+		        		absMaze[i+1][j+1] = maze[i][j];
+		        	}
+		        }
+		        
+		        for(int i=0;i<arrayX+2;i++) {
+		        	for(int j=0; j<arrayY+2;j++) {
+		        		System.out.print(absMaze[i][j]);
+		        	}
+		        	System.out.println();
+		        }
+
 
 			}
 
@@ -127,9 +153,9 @@ public class frmFirstProblem extends JFrame {
 		JButton btnNewButton = new JButton("Generate");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int width = matrix[0].length;
-				int height = matrix.length;
-				m.load(width, height, matrix);
+				int width = absMaze[0].length;
+				int height = absMaze.length;
+				m.load(width, height, absMaze);
 			}
 		});
 		btnNewButton.setBounds(878, 91, 101, 33);
