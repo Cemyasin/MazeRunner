@@ -135,7 +135,7 @@ public class Maze extends JPanel implements ActionListener {
 
 				}
 				for (int i = 0; i < stack3.size() - 1; i++) {
-//					g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
+					g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
 					g.setColor(new Color(0,235,255));
 					g.fillRect(stack3.get(i).x * rectWidth, stack3.get(i).y * rectHeight, rectWidth, rectHeight);
 
@@ -147,7 +147,6 @@ public class Maze extends JPanel implements ActionListener {
 
 			}
 
-			// Draw start and finish
 			if (solution) {
 				for (int i = 0; i < height; i++) {
 					for (int j = 0; j < width; j++) {

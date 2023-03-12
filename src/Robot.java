@@ -8,15 +8,19 @@ import java.util.List;
 
 public class Robot {
 	Point point;
-	Point parent;
-	List<Point> neighbours;
+	Robot parent;
+	List<Robot> neighbours;
 	int cost;
 
-	public Robot(Point point, Point parent, List<Point> neighbours, int cost) {
+	public Robot(Point point, Robot parent, List<Robot> neighbours, int cost) {
 		this.point = point;
 		this.parent = parent;
 		this.neighbours = neighbours;
 		this.cost = cost;
+	}
+	
+	public Robot() {
+		
 	}
 
 }

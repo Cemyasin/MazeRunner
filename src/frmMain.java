@@ -25,6 +25,8 @@ public class frmMain extends JFrame {
 	int width = 40;
 	int height = 40;
 	private long time;
+	private JTextField textWidth;
+	private JTextField textHeight;
 
 	/**
 	 * Launch the application.
@@ -74,6 +76,22 @@ public class frmMain extends JFrame {
 		textField_1.setBounds(818, 534, 156, 32);
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
+
+		JButton btnGo = new JButton("Çalışmıyor!!");
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+//				width=Integer.parseInt(textWidth.getText());
+//				height=Integer.parseInt(textHeight.getText());
+//				
+//				maze = new Maze(width, height);
+//				panel = maze;
+//				panel.setVisible(true);
+//				panel.setBounds(10, 30, 784, 770);
+//				contentPane.add(panel);
+			}
+		});
+		btnGo.setBounds(845, 131, 110, 25);
+		contentPane.add(btnGo);
 
 		JButton btnGenerate = new JButton("Generate");
 		btnGenerate.addActionListener(new ActionListener() {
@@ -147,7 +165,7 @@ public class frmMain extends JFrame {
 				builder.append("----------Solution---------- \n");
 				builder.append("Step Number : " + maze.truePath.size());
 				builder.append("\n");
-				builder.append("Solition Time : " + time+"ms");
+				builder.append("Solition Time : " + time + "ms");
 				builder.append("\n");
 				for (Point is : maze.truePath) {
 					builder.append("(" + is.y + "," + is.x + ")" + "=>");
@@ -161,6 +179,28 @@ public class frmMain extends JFrame {
 		});
 		btnLogging.setBounds(839, 413, 123, 41);
 		contentPane.add(btnLogging);
+
+		textWidth = new JTextField();
+		textWidth.setToolTipText("Width");
+		textWidth.setBounds(853, 90, 32, 20);
+		contentPane.add(textWidth);
+		textWidth.setColumns(10);
+
+		JLabel lblW = new JLabel("W:");
+		lblW.setOpaque(true);
+		lblW.setBounds(837, 93, 15, 14);
+		contentPane.add(lblW);
+
+		JLabel lblH = new JLabel("H:");
+		lblH.setOpaque(true);
+		lblH.setBounds(896, 93, 15, 14);
+		contentPane.add(lblH);
+
+		textHeight = new JTextField();
+		textHeight.setToolTipText("Height");
+		textHeight.setColumns(10);
+		textHeight.setBounds(911, 89, 32, 20);
+		contentPane.add(textHeight);
 
 	}
 }
