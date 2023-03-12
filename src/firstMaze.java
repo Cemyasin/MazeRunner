@@ -12,23 +12,30 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class firstMaze extends JPanel implements ActionListener {
+	private static final long serialVersionUID = 1L;
+
 	Stack<Point> stack = new Stack<>();
 
-	private int width, height, rectWidth, rectHeight;
-	private boolean[][] maze;
+	int width, height, rectWidth, rectHeight;
+	boolean[][] maze;
 	static Point current;
-	boolean flag = false;
-	private boolean solution = false, clear = false;
+
+	private boolean solution = false;
+	boolean clear = false;
 	int[][] mazee;
-	Timer timer = new Timer(1, this);
+	Timer timer = new Timer(500, this);
 	static int START_X;
 	static int START_Y;
 	static int END_X;
 	static int END_Y;
+	boolean running = false;
+	boolean found = false;
 
 	Random rn = new Random();
 	List<Robot> acilanYerler = new ArrayList<Robot>();
 	List<Robot> neighbours = new ArrayList<>();
+	Stack<Point> visited = new Stack<>();
+	List<Point> visited2 = new ArrayList<>();
 
 	Robot robot;
 
@@ -59,14 +66,25 @@ public class firstMaze extends JPanel implements ActionListener {
 
 		robot = new Robot(current, null, null, 0);
 		acilanYerler.add(robot);
+
 	}
 
 	public boolean solve() {
 
-		int nextStep = rn.nextInt(4);
+		running = true;
+
+		if (current.x == END_X && current.y == END_Y) {
+			visited.add(current);
+			visited2.add(current);
+			running = false;
+			found = true;
+			return false;
+		}
+
+		List<Robot> neighbours = new ArrayList<>();
 		for (int x = current.x - 1; x <= current.x + 1; x++) {
 			for (int y = current.y - 1; y <= current.y + 1; y++) {
-				if (x < 0 || x >= mazee.length || y < 0 || y >= mazee[0].length) {
+				if (x < 0 || x >= mazee[0].length || y < 0 || y >= mazee.length) {
 					continue;
 				}
 				if ((x == current.x && y == current.y) || (x - 1 == current.x && y - 1 == current.y)
@@ -74,33 +92,70 @@ public class firstMaze extends JPanel implements ActionListener {
 						|| (x + 1 == current.x && y + 1 == current.y)) {
 					continue;
 				}
-				Point xy = new Point(y, x);
+				Point xy = new Point(x, y);
 				int cost = robot.cost + 1;
-				acilanYerler.add(new Robot(xy, current, stack, cost));
 
+				Robot neighbour = new Robot(xy, robot, null, cost);
+
+				acilanYerler.add(neighbour);
+
+				if (mazee[y][x] == 0) {
+					neighbours.add(neighbour);
+					robot.neighbours = neighbours;
+				}
 			}
 
 		}
 
-		if (nextStep == 0) { // sola git
-			if (mazee[current.y][current.x - 1] == 0) {
-				current.x = current.x - 1;
-			}
-		} else if (nextStep == 1) { // sağa git
-			if (mazee[current.y][current.x + 1] == 0) {
-				current.x = current.x + 1;
+		boolean flag = false;
+		while (!flag) {
 
-			}
-		} else if (nextStep == 2) { // yukarı git
-			if (mazee[current.y + 1][current.x] == 0) {
-				current.y = current.y + 1;
+			int nextStep = rn.nextInt(4);
+			if (nextStep == 0 && !visited.contains(current)) { // sola git
+				if (current.x > 1) {
+					if (mazee[current.y][current.x - 1] == 0) {
+						visited.add(current);
+						visited2.add(current);
+						current = new Point(current.x - 1, current.y);
+						flag = true;
+					}
+				}
 
-			}
-		} else if (nextStep == 3) { // aşağı gir
-			if (mazee[current.y - 1][current.x] == 0) {
-				current.y = current.y - 1;
+			} else if (nextStep == 1 && !visited.contains(current)) { // sağa git
+				if (current.x < mazee[0].length - 2) {
+					if (mazee[current.y][current.x + 1] == 0) {
+						visited.add(current);
+						visited2.add(current);
+						current = new Point(current.x + 1, current.y);
+						flag = true;
 
+					}
+				}
+
+			} else if (nextStep == 2 && !visited.contains(current)) { // yukarı git
+				if (current.y > 1) {
+					if (mazee[current.y - 1][current.x] == 0) {
+						visited.add(current);
+						visited2.add(current);
+						current = new Point(current.x, current.y - 1);
+						flag = true;
+
+					}
+				}
+
+			} else if (nextStep == 3 && !visited.contains(current)) { // aşağı gir
+				if (current.y < mazee.length - 2) {
+					if (mazee[current.y + 1][current.x] == 0) {
+						visited.add(current);
+						visited2.add(current);
+						current = new Point(current.x, current.y + 1);
+						flag = true;
+					}
+				}
+			} else {
+				visited.pop();
 			}
+
 		}
 
 		return false;
@@ -110,67 +165,93 @@ public class firstMaze extends JPanel implements ActionListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// Calculate dimensions of rectangles
-
 		if (!clear) {
-			for (int i = 0; i < height - 1; i++) {
-				for (int j = 0; j < width - 1; j++) {
-					if (mazee[i][j] == 0) {
-						g.setColor(new Color(70, 78, 91));
-						g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-						g.setColor(Color.BLACK);
-						g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+			if (mazee != null)
+				for (int i = 0; i < mazee.length; i++) {
+					for (int j = 0; j < mazee[0].length; j++) {
 
-						// g.drawRect(j * rectWidth, i * rectHeight, j, i);
-					} else {
-
-						g.setColor(new Color(0, 0, 0));
-						g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-						g.setColor(Color.DARK_GRAY);
-						g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-
+						g.setColor(Color.GRAY);
+						g.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.LIGHT_GRAY);
+						g.drawRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
 					}
+				}
+			repaint();
 
-					g.setColor(Color.GREEN);
-					g.fillRect(rectWidth * START_X, rectHeight * START_Y, rectWidth, rectHeight);
-					g.setColor(Color.RED);
-					g.fillRect(rectWidth * END_X, rectHeight * END_Y, rectWidth, rectHeight);
+			if (!running) {
+				for (Robot robot : acilanYerler) {
+					if (robot.point.x == START_X && robot.point.y == START_Y)
+						continue;
+					if (mazee[robot.point.y][robot.point.x] == 0) {
+						g.setColor(Color.WHITE);
+						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.BLACK);
+						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
 
+					} else {
+						g.setColor(Color.BLACK);
+						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.LIGHT_GRAY);
+						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+					}
 				}
 
+				for (Point robot : visited2) {
+					g.setColor(Color.GREEN);
+					g.fillRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
+					
+					g.setColor(Color.ORANGE);
+					g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+
+					g.setColor(Color.RED);
+					g.fillRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
+					
+				}
 			}
 
 			repaint();
 
-			if (flag) {
-
-			}
-
-			// Draw start and finish
 			if (solution) {
 
 			}
+
+//			for (int i = 0; i < height; i++) {
+//				for (int j = 0; j < width; j++) {
+//
+//					g.setColor(new Color(70, 78, 91));
+//					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+//
+//					g.setColor(Color.BLACK);
+//					g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+//				}
+//
+//			}
+//			repaint();
+//
+//		}
 		} else {
-			for (int i = 0; i < height; i++) {
-				for (int j = 0; j < width; j++) {
+			if (mazee != null)
+				for (int i = 0; i < mazee.length; i++) {
+					for (int j = 0; j < mazee[0].length; j++) {
 
-					g.setColor(new Color(70, 78, 91));
-					g.fillRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
-
-					g.setColor(Color.BLACK);
-					g.drawRect(rectWidth * j, rectHeight * i, rectWidth, rectHeight);
+						g.setColor(Color.GRAY);
+						g.fillRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.LIGHT_GRAY);
+						g.drawRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
+					}
 				}
-
-			}
 			repaint();
-
 		}
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
