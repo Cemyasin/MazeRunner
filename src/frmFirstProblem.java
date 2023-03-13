@@ -131,6 +131,7 @@ public class frmFirstProblem extends JFrame {
 				int width = absMaze[0].length;
 				int height = absMaze.length;
 				m.load(width, height, absMaze);
+				m.repaint();
 
 			}
 		});
@@ -140,22 +141,7 @@ public class frmFirstProblem extends JFrame {
 		JButton btnStart = new JButton("Solve");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				m.solve();
-				int i=0;
-				while (m.running) {
-					m.solve();
-					
-					
-//						try {
-//							System.out.println("girdi"+i++);
-//							Thread.sleep(10);
-//							
-//						} catch (InterruptedException e1) {
-//							// TODO Auto-generated catch block
-//							e1.printStackTrace();
-//						}
-//					panel.repaint();
-				}
+				m.running=true; 
 
 			}
 		});
