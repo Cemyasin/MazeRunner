@@ -141,16 +141,21 @@ public class frmFirstProblem extends JFrame {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				m.solve();
-//						try {
+				int i=0;
 				while (m.running) {
 					m.solve();
-					repaint();
-//					 Thread.sleep(500);
-				}
-//						} catch (InterruptedException ex) {
-//
-//						}
 					
+					
+//						try {
+//							System.out.println("girdi"+i++);
+//							Thread.sleep(10);
+//							
+//						} catch (InterruptedException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						}
+//					panel.repaint();
+				}
 
 			}
 		});
@@ -173,7 +178,7 @@ public class frmFirstProblem extends JFrame {
 
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				m.running=false;
+				m.running = false;
 				m.clear = true;
 				m.visited2.clear();
 				m.visited.clear();

@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -19,6 +20,7 @@ public class firstMaze extends JPanel implements ActionListener {
 	int width, height, rectWidth, rectHeight;
 	boolean[][] maze;
 	static Point current;
+	static boolean flag2 = false;
 
 	private boolean solution = false;
 	boolean clear = false;
@@ -36,7 +38,8 @@ public class firstMaze extends JPanel implements ActionListener {
 	List<Robot> neighbours = new ArrayList<>();
 	Stack<Point> visited = new Stack<>();
 	List<Point> visited2 = new ArrayList<>();
-
+	Stack<Point> visited3 = new Stack<>();
+	Stack<Point> acik = new Stack<>();
 	Robot robot;
 
 	public void load(int width, int height, int[][] mazeee) {
@@ -77,6 +80,7 @@ public class firstMaze extends JPanel implements ActionListener {
 			visited.add(current);
 			visited2.add(current);
 			running = false;
+			flag2 = true;
 			found = true;
 			return false;
 		}
@@ -157,7 +161,7 @@ public class firstMaze extends JPanel implements ActionListener {
 			}
 
 		}
-
+		repaint();
 		return false;
 
 	}
@@ -176,45 +180,54 @@ public class firstMaze extends JPanel implements ActionListener {
 						g.drawRect(j * rectWidth, i * rectHeight, rectWidth, rectHeight);
 					}
 				}
+
 			repaint();
 
-			if (!running) {
-				for (Robot robot : acilanYerler) {
-					if (robot.point.x == START_X && robot.point.y == START_Y)
+			if (flag2) {
+				for (Point robot : acik) {
+					if (robot.x == START_X && robot.y == START_Y)
 						continue;
-					if (mazee[robot.point.y][robot.point.x] == 0) {
+					if (mazee[robot.y][robot.x] == 0) {
 						g.setColor(Color.WHITE);
-						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 						g.setColor(Color.BLACK);
-						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 
 					} else {
 						g.setColor(Color.BLACK);
-						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 						g.setColor(Color.LIGHT_GRAY);
-						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 					}
 				}
+				
+				for (Point robot : visited3) {
 
-				for (Point robot : visited2) {
-					g.setColor(Color.GREEN);
-					g.fillRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLUE);
+					g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 					g.setColor(Color.BLACK);
-					g.drawRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
-					
+					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+
+				}
+
+				for (Point robot : visited3) {
+
 					g.setColor(Color.ORANGE);
 					g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 					g.setColor(Color.BLACK);
 					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 
-					g.setColor(Color.RED);
-					g.fillRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
-					g.setColor(Color.BLACK);
-					g.drawRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
-					
 				}
 			}
+			g.setColor(Color.GREEN);
+			g.fillRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
+			g.setColor(Color.BLACK);
+			g.drawRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
 
+			g.setColor(Color.RED);
+			g.fillRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
+			g.setColor(Color.BLACK);
+			g.drawRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
 			repaint();
 
 			if (solution) {
@@ -250,9 +263,37 @@ public class firstMaze extends JPanel implements ActionListener {
 		}
 	}
 
+	Thread thread;
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					int i2 = 0;
+					if (flag2) {
+						for (int i = 0; i < visited2.size(); i++) {
+							if (visited2.get(i).x > 0 && visited2.get(i).y > 0 && visited2.get(i).x < mazee[0].length
+									&& visited2.get(i).y < mazee.length) {
+								acik.push(new Point(visited2.get(i).x - 1, visited2.get(i).y));
+								acik.push(new Point(visited2.get(i).x + 1, visited2.get(i).y));
+								acik.push(new Point(visited2.get(i).x, visited2.get(i).y - 1));
+								acik.push(new Point(visited2.get(i).x, visited2.get(i).y + 1));
+							}
+							visited3.push(visited2.get(i));
+							System.out.println("girdi" + i2++);
+							repaint();
+							thread.sleep(50);
+						}
+						flag2=false;
 
+					}
+
+				} catch (InterruptedException ex) {
+//					flag2 = false;
+				}
+			}
+		}).start();
 	}
-
 }

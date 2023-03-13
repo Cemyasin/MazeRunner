@@ -207,10 +207,10 @@ public class Maze extends JPanel implements ActionListener {
 	}
 
 	Thread thread;
-
+int a=0;
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+System.out.println("asdsadsadsad");
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -226,7 +226,7 @@ public class Maze extends JPanel implements ActionListener {
 								show.push(new Point(visited.get(i) , visited.get(i + 1) + 1));
 							}
 							stack3.push(new Point(visited.get(i++), visited.get(i)));
-
+							System.out.println("girdi " +a++);
 							repaint();
 							thread.sleep(50);
 						}
