@@ -19,12 +19,12 @@ public class firstMaze extends JPanel implements ActionListener {
 	int width, height, rectWidth, rectHeight;
 	boolean[][] maze;
 	static Point current;
-	static boolean flag2 = false;
+	boolean flag2 = true;
 
-	private boolean solution = false;
+	boolean solution = false;
 	boolean clear = false;
 	int[][] mazee;
-	Timer timer = new Timer(300, this);
+	Timer timer = new Timer(50, this);
 	static int START_X;
 	static int START_Y;
 	static int END_X;
@@ -37,9 +37,11 @@ public class firstMaze extends JPanel implements ActionListener {
 	List<Robot> neighbours = new ArrayList<>();
 	Stack<Point> visited = new Stack<>();
 	List<Point> visited2 = new ArrayList<>();
-	Stack<Point> visited3 = new Stack<>();
+	List<Robot> visited3 = new ArrayList<Robot>();
+	List<Robot> path = new ArrayList<>();
 	Stack<Point> acik = new Stack<>();
-	Robot robot;
+	static Robot robot;
+	Robot firstRobot;
 
 	public void load(int width, int height, int[][] mazeee) {
 		width -= width % 2;
@@ -66,23 +68,18 @@ public class firstMaze extends JPanel implements ActionListener {
 		} while (mazee[END_Y][END_X] != 0 || (END_Y == START_Y && END_X == START_X));
 		current = new Point(START_X, START_Y);
 
-		robot = new Robot(current, null, null, 0);
+		this.robot = new Robot(current, null, null, 0);
+		firstRobot = robot;
 		acilanYerler.add(robot);
+		visited.add(current);
+		visited3.add(robot);
 
 	}
 
 	public boolean solve() {
 
 		running = true;
-
-		if (current.x == END_X && current.y == END_Y) {
-			visited.add(current);
-			visited2.add(current);
-			running = false;
-			flag2 = true;
-			found = true;
-			return false;
-		}
+		flag2 = false;
 
 		List<Robot> neighbours = new ArrayList<>();
 		for (int x = current.x - 1; x <= current.x + 1; x++) {
@@ -98,16 +95,62 @@ public class firstMaze extends JPanel implements ActionListener {
 				Point xy = new Point(x, y);
 				int cost = robot.cost + 1;
 
-				Robot neighbour = new Robot(xy, robot, null, cost);
+				Robot neighbour = null;
+				boolean f = false;
+				for (Robot robot : acilanYerler) {
+					if (xy.x == robot.point.x && xy.y == robot.point.y) {
+						neighbour = robot;
+						f = true;
+						break;
 
-				acilanYerler.add(neighbour);
+					}
+				}
+				if (!f) {
+					neighbour = new Robot(xy, null, null, cost);
+					acilanYerler.add(neighbour);
 
+				}
 				if (mazee[y][x] == 0) {
+					visited3.add(neighbour);
 					neighbours.add(neighbour);
 					robot.neighbours = neighbours;
+					List<Robot> nb;
+					if (neighbour.neighbours == null) {
+						nb = new ArrayList<>();
+						nb.add(robot);
+					} else if (!neighbour.neighbours.contains(robot)) {
+						neighbour.neighbours.add(robot);
+					}
+				}
+
+				if (mazee[y][x] == 0) {
+
 				}
 			}
 
+		}
+//		System.out.println(robot.point + "---" + robot.cost + "*** " );
+		path.add(robot);
+//		for (Robot robot : path) {
+//			System.out.println(robot.point+"---"+robot.cost+"// ");
+//		}
+//		System.out.println("**********");
+
+		if (current.x == END_X && current.y == END_Y) {
+			visited.add(current);
+			visited2.add(current);
+			running = false;
+
+			found = true;
+			return false;
+		}
+		if ((current.x + 1 == END_X && current.y == END_Y) || (current.x - 1 == END_X && current.y == END_Y)
+				|| (current.x == END_X && current.y == END_Y + 1) || (current.x == END_X && current.y == END_Y - 1)) {
+			visited.add(current);
+			visited2.add(current);
+			running = false;
+			found = true;
+			return false;
 		}
 
 		boolean flag = false;
@@ -120,16 +163,7 @@ public class firstMaze extends JPanel implements ActionListener {
 						visited.add(current);
 						visited2.add(current);
 						current = new Point(current.x - 1, current.y);
-						if ((current.x+1 == END_X && current.y == END_Y)||(current.x-1 == END_X && current.y == END_Y)||
-								(current.x == END_X && current.y == END_Y+1)||(current.x == END_X && current.y == END_Y-1)) {
-							visited.add(current);
-							visited2.add(current);
-							running = false;
-							flag2 = true;
-							found = true;
-							return false;
-						}
-						
+
 						flag = true;
 					}
 				}
@@ -140,15 +174,7 @@ public class firstMaze extends JPanel implements ActionListener {
 						visited.add(current);
 						visited2.add(current);
 						current = new Point(current.x + 1, current.y);
-						if ((current.x+1 == END_X && current.y == END_Y)||(current.x-1 == END_X && current.y == END_Y)||
-								(current.x == END_X && current.y == END_Y+1)||(current.x == END_X && current.y == END_Y-1)) {
-							visited.add(current);
-							visited2.add(current);
-							running = false;
-							flag2 = true;
-							found = true;
-							return false;
-						}
+
 						flag = true;
 
 					}
@@ -160,15 +186,6 @@ public class firstMaze extends JPanel implements ActionListener {
 						visited.add(current);
 						visited2.add(current);
 						current = new Point(current.x, current.y - 1);
-						if ((current.x+1 == END_X && current.y == END_Y)||(current.x-1 == END_X && current.y == END_Y)||
-								(current.x == END_X && current.y == END_Y+1)||(current.x == END_X && current.y == END_Y-1)) {
-							visited.add(current);
-							visited2.add(current);
-							running = false;
-							flag2 = true;
-							found = true;
-							return false;
-						}
 						flag = true;
 
 					}
@@ -180,15 +197,6 @@ public class firstMaze extends JPanel implements ActionListener {
 						visited.add(current);
 						visited2.add(current);
 						current = new Point(current.x, current.y + 1);
-						if ((current.x+1 == END_X && current.y == END_Y)||(current.x-1 == END_X && current.y == END_Y)||
-								(current.x == END_X && current.y == END_Y+1)||(current.x == END_X && current.y == END_Y-1)) {
-							visited.add(current);
-							visited2.add(current);
-							running = false;
-							flag2 = true;
-							found = true;
-							return false;
-						}
 						flag = true;
 					}
 				}
@@ -196,6 +204,17 @@ public class firstMaze extends JPanel implements ActionListener {
 				visited.pop();
 			}
 
+		}
+
+		for (Robot ro : robot.neighbours) {
+
+			if (current.x == ro.point.x && current.y == ro.point.y) {
+				if (robot.cost == 0) {
+					robot.next = ro;
+				}
+				robot = ro;
+
+			}
 		}
 //		repaint();
 		return false;
@@ -218,7 +237,6 @@ public class firstMaze extends JPanel implements ActionListener {
 					}
 				}
 
-
 			if (running) {
 				for (Robot robot : acilanYerler) {
 					if (robot.point.x == START_X && robot.point.y == START_Y)
@@ -237,7 +255,8 @@ public class firstMaze extends JPanel implements ActionListener {
 						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
 					}
 				}
-
+				g.setColor(Color.BLUE);
+				g.fillOval(current.x * rectWidth, current.y * rectHeight, rectWidth, rectHeight);
 				for (Point robot : visited2) {
 
 					g.setColor(Color.ORANGE);
@@ -246,41 +265,76 @@ public class firstMaze extends JPanel implements ActionListener {
 					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 
 				}
-			}else {
-				for (Robot robot : acilanYerler) {
-					if(robot!=null) {
-					if (robot.point.x == START_X && robot.point.y == START_Y)
-						continue;
-					if (mazee[robot.point.y][robot.point.x] == 0) {
+				for (Point robot : visited) {
 
-						g.setColor(Color.WHITE);
-						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
-						g.setColor(Color.BLACK);
-						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
-
-					} else {
-						g.setColor(Color.BLACK);
-						g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
-						g.setColor(Color.LIGHT_GRAY);
-						g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
-					}	
-					}
-					
-					
-				}
-
-				for (Point robot : visited2) {
-					if(robot!=null) {
-						g.setColor(Color.ORANGE);
+					g.setColor(Color.MAGENTA);
 					g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 					g.setColor(Color.BLACK);
 					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+
+				}
+				g.setColor(Color.BLUE);
+				g.fillOval(current.x * rectWidth, current.y * rectHeight, rectWidth, rectHeight);
+			} else {
+				for (Robot robot : acilanYerler) {
+					if (robot != null) {
+						if (robot.point.x == START_X && robot.point.y == START_Y)
+							continue;
+						if (mazee[robot.point.y][robot.point.x] == 0) {
+
+							g.setColor(Color.WHITE);
+							g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+							g.setColor(Color.BLACK);
+							g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+
+						} else {
+							g.setColor(Color.BLACK);
+							g.fillRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+							g.setColor(Color.LIGHT_GRAY);
+							g.drawRect(robot.point.x * rectWidth, robot.point.y * rectHeight, rectWidth, rectHeight);
+						}
 					}
-					
+
+				}
+				for (Point robot : visited2) {
+					if (robot != null) {
+						g.setColor(Color.ORANGE);
+						g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.BLACK);
+						g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+					}
+				}
+				for (Point robot : visited) {
+
+					g.setColor(Color.MAGENTA);
+					g.fillRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 
 				}
 				
+				if (found) {
+				Robot rob;
+				rob = path.get(path.size() - 1);
+				while (rob.cost > 0) {
+					g.setColor(Color.cyan);
+					g.fillRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
+					g.setColor(Color.BLACK);
+					g.drawRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
+					if(rob.neighbours!=null)
+					for (Robot neig : rob.neighbours) {
+						if (neig.cost < rob.cost) {
+							rob = neig;
+						}
+						
+						
+					}
+					repaint();
+				}
 			}
+
+			}
+
 			g.setColor(Color.GREEN);
 			g.fillRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
 			g.setColor(Color.BLACK);
@@ -291,11 +345,7 @@ public class firstMaze extends JPanel implements ActionListener {
 			g.setColor(Color.BLACK);
 			g.drawRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
 
-
-			if (solution) {
-
-			}
-
+			
 
 		} else {
 			if (mazee != null)
@@ -318,27 +368,28 @@ public class firstMaze extends JPanel implements ActionListener {
 //
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-//		solve();
-					int i = 0;
-					while (running) {
-						solve();
-						repaint();
-						System.out.println("girdi" + i++);
-						thread.sleep(500);
+//		new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				try {
+		if (running) {
+			int i = 0;
+//					while (running) {
+			solve();
+			repaint();
+			System.out.println("girdi" + i++);
+//						thread.sleep(100);
+//				}
+//					solve();
 
-					}
+		}
 
-				} catch (InterruptedException ex) {
+//				} catch (InterruptedException ex) {
+//
+//				}
+//			}
+//		}).start();
 
-				}
-			}
-		}).start();
-
-	
 		repaint();
 	}
 }

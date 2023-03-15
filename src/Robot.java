@@ -1,20 +1,15 @@
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 public class Robot {
 	Point point;
-	Robot parent;
+	Robot next;
 	List<Robot> neighbours;
 	int cost;
 
-	public Robot(Point point, Robot parent, List<Robot> neighbours, int cost) {
+	public Robot(Point point, Robot next, List<Robot> neighbours, int cost) {
 		this.point = point;
-		this.parent = parent;
+		this.next = next;
 		this.neighbours = neighbours;
 		this.cost = cost;
 	}
@@ -24,6 +19,15 @@ public class Robot {
 	}
 
 }
+
+
+//for (Robot robo : neighbours) {
+//	if (robot.parent.cost > robo.cost) {
+//		robot.parent = robo;
+//	}
+//}
+//robot=new Robot(current, robot.parent, neighbours, cost);
+
 
 
 //

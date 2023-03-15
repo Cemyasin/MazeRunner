@@ -1,5 +1,4 @@
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -16,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-public class frmFirstProblem extends JFrame {
+public class frmFirstProblem2 extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;
@@ -38,7 +37,7 @@ public class frmFirstProblem extends JFrame {
 		});
 	}
 
-	public frmFirstProblem() throws IOException {
+	public frmFirstProblem2() throws IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1320, 756);
 		contentPane = new JPanel();
@@ -155,7 +154,6 @@ public class frmFirstProblem extends JFrame {
 
 		btnShowPath.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				m.solution=true;
 
 			}
 		});
@@ -187,22 +185,11 @@ public class frmFirstProblem extends JFrame {
 
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
-				for (Point po: m.visited) {
-					System.out.println(po);
-					
-				}
-				m.path.clear();
 				m.running = false;
-				m.flag2=true;
 				m.clear = true;
-				m.found=false;
-				m.solution=false;
-				m.robot=new Robot();
 				m.visited2.clear();
 				m.visited.clear();
 				m.acilanYerler.clear();
-				m.path=new ArrayList<>();
 				m.visited2 = new ArrayList<>();
 				m.visited = new Stack<>();
 				m.acilanYerler = new ArrayList<>();
