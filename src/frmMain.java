@@ -17,7 +17,7 @@ public class frmMain extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private JPanel contentPane;
-	private Maze maze;
+	private SecondMaze maze;
 	private JPanel panel;
 	private int[][] mazeArray;
 	private JTextField textField;
@@ -59,7 +59,7 @@ public class frmMain extends JFrame {
 		contentPane.setLayout(null);
 		panel = new JPanel();
 
-		maze = new Maze(width, height);
+		maze = new SecondMaze(width, height);
 		panel = maze;
 		panel.setVisible(true);
 		panel.setBounds(10, 30, 784, 770);
@@ -80,14 +80,16 @@ public class frmMain extends JFrame {
 		JButton btnGo = new JButton("Çalışmıyor!!");
 		btnGo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				width=Integer.parseInt(textWidth.getText());
-//				height=Integer.parseInt(textHeight.getText());
-//				
+				width=Integer.parseInt(textWidth.getText());
+				height=Integer.parseInt(textHeight.getText());
+				
 //				maze = new Maze(width, height);
 //				panel = maze;
 //				panel.setVisible(true);
 //				panel.setBounds(10, 30, 784, 770);
 //				contentPane.add(panel);
+				maze.load(width,height) ;
+				repaint();
 			}
 		});
 		btnGo.setBounds(845, 131, 110, 25);

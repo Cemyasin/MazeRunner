@@ -29,7 +29,7 @@ public class frmFirstProblem extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					frmFirstProblem2 frame = new frmFirstProblem2();
+					frmFirstProblem frame = new frmFirstProblem();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -150,19 +150,26 @@ public class frmFirstProblem extends JFrame {
 		contentPane.add(btnStart);
 
 		JButton btnShowPath = new JButton("Show Path");
+		btnShowPath.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("dsffwfwqafwf");
+			}
+		});
 		btnShowPath.setBounds(878, 211, 101, 33);
 		contentPane.add(btnShowPath);
 
-		btnShowPath.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				m.solution=true;
-
-			}
-		});
 
 		JButton btnClear = new JButton("Clear");
+		
 		btnClear.setBounds(878, 331, 101, 33);
 		contentPane.add(btnClear);
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				m.getClear();
+	
+			}
+		});
 		
 		JButton btnLogging = new JButton("Logging");
 		btnLogging.addActionListener(new ActionListener() {
@@ -185,29 +192,7 @@ public class frmFirstProblem extends JFrame {
 		btnLogging.setBounds(878, 273, 101, 33);
 		contentPane.add(btnLogging);
 
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			
-				for (Point po: m.visited) {
-					System.out.println(po);
-					
-				}
-				m.path.clear();
-				m.running = false;
-				m.flag2=true;
-				m.clear = true;
-				m.found=false;
-				m.solution=false;
-				m.robot=new Robot();
-				m.visited2.clear();
-				m.visited.clear();
-				m.acilanYerler.clear();
-				m.path=new ArrayList<>();
-				m.visited2 = new ArrayList<>();
-				m.visited = new Stack<>();
-				m.acilanYerler = new ArrayList<>();
-			}
-		});
+		
 
 	}
 }

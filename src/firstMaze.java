@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -24,7 +25,7 @@ public class firstMaze extends JPanel implements ActionListener {
 	boolean solution = false;
 	boolean clear = false;
 	int[][] mazee;
-	Timer timer = new Timer(50, this);
+	Timer timer = new Timer(10, this);
 	static int START_X;
 	static int START_Y;
 	static int END_X;
@@ -81,6 +82,9 @@ public class firstMaze extends JPanel implements ActionListener {
 		running = true;
 		flag2 = false;
 
+		if (!path.contains(robot))
+			path.add(robot);
+
 		List<Robot> neighbours = new ArrayList<>();
 		for (int x = current.x - 1; x <= current.x + 1; x++) {
 			for (int y = current.y - 1; y <= current.y + 1; y++) {
@@ -112,25 +116,64 @@ public class firstMaze extends JPanel implements ActionListener {
 				}
 				if (mazee[y][x] == 0) {
 					visited3.add(neighbour);
-					neighbours.add(neighbour);
+					if (!path.contains(neighbour)) {
+						path.add(neighbour);
+					}
+					if (robot.neighbours != null) {
+						neighbours = robot.neighbours;
+					}
+					if (!neighbours.contains(neighbour))
+						neighbours.add(neighbour);
 					robot.neighbours = neighbours;
 					List<Robot> nb;
 					if (neighbour.neighbours == null) {
 						nb = new ArrayList<>();
 						nb.add(robot);
+						neighbour.neighbours = nb;
 					} else if (!neighbour.neighbours.contains(robot)) {
 						neighbour.neighbours.add(robot);
 					}
 				}
 
 				if (mazee[y][x] == 0) {
+					if (neighbour.neighbours != null)
+						for (Robot robot : path) {
+							if ((neighbour.point.x + 1 == robot.point.x && neighbour.point.y == robot.point.y)) {
+								if (!neighbour.neighbours.contains(robot)) {
+									neighbour.neighbours.add(robot);
+								}
+								if (!robot.neighbours.contains(neighbour)) {
+									robot.neighbours.add(neighbour);
+								}
+							} else if ((neighbour.point.x - 1 == robot.point.x && neighbour.point.y == robot.point.y)) {
+								if (!neighbour.neighbours.contains(robot)) {
+									neighbour.neighbours.add(robot);
+								}
+								if (!robot.neighbours.contains(neighbour)) {
+									robot.neighbours.add(neighbour);
+								}
+							} else if ((neighbour.point.x == robot.point.x && neighbour.point.y + 1 == robot.point.y)) {
+								if (!neighbour.neighbours.contains(robot)) {
+									neighbour.neighbours.add(robot);
+								}
+								if (!robot.neighbours.contains(neighbour)) {
+									robot.neighbours.add(neighbour);
+								}
+							} else if ((neighbour.point.x == robot.point.x && neighbour.point.y - 1 == robot.point.y)) {
+								if (!neighbour.neighbours.contains(robot)) {
+									neighbour.neighbours.add(robot);
+								}
+								if (!robot.neighbours.contains(neighbour)) {
+									robot.neighbours.add(neighbour);
+								}
+							}
 
+						}
 				}
 			}
 
 		}
 //		System.out.println(robot.point + "---" + robot.cost + "*** " );
-		path.add(robot);
 //		for (Robot robot : path) {
 //			System.out.println(robot.point+"---"+robot.cost+"// ");
 //		}
@@ -139,8 +182,8 @@ public class firstMaze extends JPanel implements ActionListener {
 		if (current.x == END_X && current.y == END_Y) {
 			visited.add(current);
 			visited2.add(current);
-			running = false;
-
+//			running = false;
+			getSolution();
 			found = true;
 			return false;
 		}
@@ -148,7 +191,9 @@ public class firstMaze extends JPanel implements ActionListener {
 				|| (current.x == END_X && current.y == END_Y + 1) || (current.x == END_X && current.y == END_Y - 1)) {
 			visited.add(current);
 			visited2.add(current);
-			running = false;
+			timer.stop();
+//			running = false;
+			getSolution();
 			found = true;
 			return false;
 		}
@@ -219,6 +264,46 @@ public class firstMaze extends JPanel implements ActionListener {
 //		repaint();
 		return false;
 
+	}
+
+	public void getSolution() {
+		for (int i = 0; i < path.size() - 1; i++) {
+			for (Robot robot : path) {
+
+				for (Robot neighbour : robot.neighbours) {
+					if (robot.cost < neighbour.cost) {
+						neighbour.cost = robot.cost + 1;
+					} else if (robot.cost > neighbour.cost) {
+						robot.cost = neighbour.cost + 1;
+					}
+				}
+
+			}
+		}
+		solution=true;
+
+	}
+
+	public void getClear() {
+		for (Robot po : path) {
+			System.out.println(po.point);
+
+		}
+
+		running = false;
+		flag2 = true;
+		clear = true;
+		found = false;
+		solution = false;
+		robot = new Robot();
+		visited2.clear();
+		visited.clear();
+		path.clear();
+		acilanYerler.clear();
+		path = new ArrayList<>();
+		visited2 = new ArrayList<>();
+		visited = new Stack<>();
+		acilanYerler = new ArrayList<>();
 	}
 
 	@Override
@@ -312,29 +397,28 @@ public class firstMaze extends JPanel implements ActionListener {
 					g.drawRect(robot.x * rectWidth, robot.y * rectHeight, rectWidth, rectHeight);
 
 				}
+
 				
-				if (found) {
-				Robot rob;
-				rob = path.get(path.size() - 1);
-				while (rob.cost > 0) {
-					g.setColor(Color.cyan);
-					g.fillRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
-					g.setColor(Color.BLACK);
-					g.drawRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
-					if(rob.neighbours!=null)
-					for (Robot neig : rob.neighbours) {
-						if (neig.cost < rob.cost) {
-							rob = neig;
+
+			}
+			if (solution) {
+					Robot rob;
+					rob = path.get(path.size() - 1);
+					while (rob.cost > 0) {
+						g.setColor(Color.cyan);
+						g.fillRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
+						g.setColor(Color.BLACK);
+						g.drawRect(rob.point.x * rectWidth, rob.point.y * rectHeight, rectWidth, rectHeight);
+//					if(rob.neighbours!=null)
+						for (Robot neig : rob.neighbours) {
+							if (neig.cost < rob.cost) {
+								rob = neig;
+							}
+
 						}
-						
-						
+						repaint();
 					}
-					repaint();
 				}
-			}
-
-			}
-
 			g.setColor(Color.GREEN);
 			g.fillRect(START_X * rectWidth, START_Y * rectHeight, rectWidth, rectHeight);
 			g.setColor(Color.BLACK);
@@ -344,8 +428,6 @@ public class firstMaze extends JPanel implements ActionListener {
 			g.fillRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
 			g.setColor(Color.BLACK);
 			g.drawRect(END_X * rectWidth, END_Y * rectHeight, rectWidth, rectHeight);
-
-			
 
 		} else {
 			if (mazee != null)
@@ -364,8 +446,8 @@ public class firstMaze extends JPanel implements ActionListener {
 	}
 
 	Thread thread;
+	int i = 0;
 
-//
 	@Override
 	public void actionPerformed(ActionEvent e) {
 //		new Thread(new Runnable() {
@@ -373,15 +455,22 @@ public class firstMaze extends JPanel implements ActionListener {
 //			public void run() {
 //				try {
 		if (running) {
-			int i = 0;
-//					while (running) {
+
+//			while (running) {
+			if(!found)
 			solve();
 			repaint();
+			
 			System.out.println("girdi" + i++);
 //						thread.sleep(100);
 //				}
 //					solve();
-
+			
+			if (solution) {
+			System.out.println("solution" + i++);
+			running=false;
+			repaint();
+		}
 		}
 
 //				} catch (InterruptedException ex) {
@@ -389,7 +478,7 @@ public class firstMaze extends JPanel implements ActionListener {
 //				}
 //			}
 //		}).start();
-
+		
 		repaint();
 	}
 }

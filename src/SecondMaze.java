@@ -9,14 +9,14 @@ import java.util.Stack;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Maze extends JPanel implements ActionListener {
+public class SecondMaze extends JPanel implements ActionListener {
 
 	Stack<Point> truePath = new Stack<>();
 	Stack<Integer> visited = new Stack<>();
 	Stack<Point> stack3 = new Stack<>();
 	Stack<Point> show = new Stack<>();
 
-	private int width, height, rectWidth, rectHeight;
+	 int width, height, rectWidth, rectHeight;
 	private boolean[][] maze;
 	static Point current;
 	boolean flag = false;
@@ -24,7 +24,7 @@ public class Maze extends JPanel implements ActionListener {
 
 	Timer timer = new Timer(500, this);
 
-	public Maze(int width, int height) {
+	public SecondMaze(int width, int height) {
 		// Make dimensions odd
 		width -= width % 2;
 		width++;
@@ -37,6 +37,18 @@ public class Maze extends JPanel implements ActionListener {
 
 	}
 
+	public void load(int width, int height) {
+		// Make dimensions odd
+		width -= width % 2;
+		width++;
+		height -= height % 2;
+		height++;
+		timer.start();
+		this.width = width;
+		this.height = height;
+		maze = new boolean[height][width];
+
+	}
 	public int[][] generate() {
 
 		clear = false;
@@ -114,7 +126,7 @@ public class Maze extends JPanel implements ActionListener {
 				g.setColor(Color.GREEN);
 				g.fillRect(0, 0, rectWidth, rectHeight);
 				g.setColor(Color.RED);
-				g.fillRect((width - 2) * rectWidth, (height-1 ) * rectHeight, rectWidth, rectHeight);
+				g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
 
 				for (int i = 0; i < show.size(); i++) {
 					if (!maze[show.get(i).y][show.get(i).x]) {
@@ -129,14 +141,13 @@ public class Maze extends JPanel implements ActionListener {
 						g.setColor(Color.DARK_GRAY);
 						g.drawRect(show.get(i).x * rectWidth, show.get(i).y * rectHeight, rectWidth, rectHeight);
 					}
-					
 
 					repaint();
 
 				}
 				for (int i = 0; i < stack3.size() - 1; i++) {
 					g.fillRect((width - 2) * rectWidth, (height - 1) * rectHeight, rectWidth, rectHeight);
-					g.setColor(new Color(0,235,255));
+					g.setColor(new Color(0, 235, 255));
 					g.fillRect(stack3.get(i).x * rectWidth, stack3.get(i).y * rectHeight, rectWidth, rectHeight);
 
 					g.setColor(Color.BLACK);
@@ -166,7 +177,7 @@ public class Maze extends JPanel implements ActionListener {
 				}
 
 				for (int i = 0; i < visited.size() - 1; i++) {
-					g.setColor(new Color(0,235,255));
+					g.setColor(new Color(0, 235, 255));
 					g.fillRect(visited.get(i) * rectWidth, visited.get(i + 1) * rectHeight, rectWidth, rectHeight);
 
 					g.setColor(Color.BLACK);
@@ -207,10 +218,11 @@ public class Maze extends JPanel implements ActionListener {
 	}
 
 	Thread thread;
-int a=0;
+	int a = 0;
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-System.out.println("asdsadsadsad");
+//System.out.println("asdsadsadsad");
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -220,13 +232,13 @@ System.out.println("asdsadsadsad");
 							// System.out.println(stack2.get(i));
 							if (visited.get(i) > 0 && visited.get(i + 1) > 0 && visited.get(i) < maze.length
 									&& visited.get(i + 1) < maze[0].length) {
-								show.push(new Point(visited.get(i) - 1, visited.get(i + 1) ));
-								show.push(new Point(visited.get(i) , visited.get(i + 1) - 1));
-								show.push(new Point(visited.get(i) + 1, visited.get(i + 1) ));
-								show.push(new Point(visited.get(i) , visited.get(i + 1) + 1));
+								show.push(new Point(visited.get(i) - 1, visited.get(i + 1)));
+								show.push(new Point(visited.get(i), visited.get(i + 1) - 1));
+								show.push(new Point(visited.get(i) + 1, visited.get(i + 1)));
+								show.push(new Point(visited.get(i), visited.get(i + 1) + 1));
 							}
 							stack3.push(new Point(visited.get(i++), visited.get(i)));
-							System.out.println("girdi " +a++);
+							System.out.println("girdi " + a++);
 							repaint();
 							thread.sleep(50);
 						}
@@ -238,7 +250,7 @@ System.out.println("asdsadsadsad");
 				}
 			}
 		}).start();
-
+repaint();
 	}
 
 	public void getSolution() {
@@ -248,13 +260,17 @@ System.out.println("asdsadsadsad");
 	}
 
 	public void remove() {
-	
+
 		clear = true;
 		solution = false;
 		truePath.clear();
 		visited.clear();
 		stack3.clear();
 		show.clear();
+		truePath = new Stack<>();
+		visited = new Stack<>();
+		stack3 = new Stack<>();
+		show = new Stack<>();
 	}
 
 	public boolean solve(int[][] maze, int x, int y, boolean flag) throws InterruptedException {
