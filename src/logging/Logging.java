@@ -10,7 +10,7 @@ public class Logging {
 		String fileName = "output.txt";
 
 		try {
-			FileWriter fileWriter = new FileWriter(fileName);
+			FileWriter fileWriter = new FileWriter(fileName,true);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 			bufferedWriter.write(data);
@@ -20,7 +20,6 @@ public class Logging {
 			fileWriter.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			

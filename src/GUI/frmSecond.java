@@ -1,4 +1,5 @@
 package GUI;
+
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -17,21 +18,18 @@ import logging.Logging;
 public class frmSecond extends JFrame {
 	private static final long serialVersionUID = 1L;
 
+	int width = 40;
+	int height = 40;
+	private double time;
+	private int[][] mazeArray;
 	private JPanel contentPane;
 	private SecondMaze maze;
 	private JPanel panel;
-	private int[][] mazeArray;
 	private JTextField textField;
 	private JTextField textField_1;
-	int width = 40;
-	int height = 40;
-	private long time;
 	private JTextField textWidth;
 	private JTextField textHeight;
 
-	/**
-	 * Launch the application.
-	 */
 	public void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -45,14 +43,12 @@ public class frmSecond extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public frmSecond() {
 
 		mazeArray = new int[height + 1][width + 1];
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("---Maze Solver---");
 		setBounds(100, 100, 1000, 850);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -71,25 +67,21 @@ public class frmSecond extends JFrame {
 		textField.setBounds(818, 477, 156, 32);
 		contentPane.add(textField);
 		textField.setColumns(10);
+		textField.setText("Solving Time : ");
 
 		textField_1 = new JTextField();
 		textField_1.setOpaque(false);
 		textField_1.setBounds(818, 534, 156, 32);
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
+		textField_1.setText("Number of Steps : ");
 
 		JButton btnGo = new JButton("START");
 		btnGo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				width=Integer.parseInt(textWidth.getText());
-				height=Integer.parseInt(textHeight.getText());
-				
-//				maze = new Maze(width, height);
-//				panel = maze;
-//				panel.setVisible(true);
-//				panel.setBounds(10, 30, 784, 770);
-//				contentPane.add(panel);
-				maze.load(width,height) ;
+				width = Integer.parseInt(textWidth.getText());
+				height = Integer.parseInt(textHeight.getText());
+				maze.load(width, height);
 				repaint();
 			}
 		});
@@ -110,9 +102,9 @@ public class frmSecond extends JFrame {
 		btnAnimation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					long start = System.nanoTime();
-					maze.solve(mazeArray, 1, 0, true);
-					long finish = System.nanoTime();
+					double start = System.nanoTime();
+					maze.solve(mazeArray, maze.startY, maze.startX, true);
+					double finish = System.nanoTime();
 					time = (finish - start) / 1000000;
 					System.out.println(time);
 				} catch (InterruptedException e1) {
@@ -123,15 +115,14 @@ public class frmSecond extends JFrame {
 		});
 		btnAnimation.setBounds(839, 252, 123, 41);
 		contentPane.add(btnAnimation);
-		textField.setText("Solving Time : ");
-		textField_1.setText("Number of Steps : ");
+
 		JButton btnNewSolve = new JButton("Solve");
 		btnNewSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				maze.getSolution();
 				textField.setText("Solving Time : " + time + "ms");
 				textField_1.setText("Number of Steps : " + maze.truePath.size());
-
 			}
 		});
 		btnNewSolve.setBounds(839, 302, 123, 41);
@@ -140,12 +131,11 @@ public class frmSecond extends JFrame {
 		JButton btnClear = new JButton("Clear");
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				maze.remove();
-				panel.removeAll(); // Panelin içeriğini temizleme
-				panel.revalidate(); // Paneli yeniden boyutlandırma ve yeniden yerleştirme
-				panel.repaint(); // Paneli yeniden çizme
-				textField.setText("Solving Time : ");
-				textField_1.setText("Number of Steps : ");
+				panel.removeAll();
+				panel.revalidate();
+				panel.repaint();
 			}
 		});
 		btnClear.setBounds(839, 352, 123, 41);

@@ -1,5 +1,7 @@
 package GUI;
+
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -21,11 +23,14 @@ import logging.Logging;
 public class frmFirst extends JFrame {
 	private static final long serialVersionUID = 1L;
 
+	FirstMaze m;
+	JPanel panel = new JPanel();
+
+	int[][] absMaze = null;
+	public static JLabel lblTime;
+	public static JLabel lblStep;
 	private JPanel contentPane;
 	private JTextField textField;
-	JPanel panel = new JPanel();
-	FirstMaze m;
-	int[][] absMaze = null;
 
 	public void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -41,7 +46,8 @@ public class frmFirst extends JFrame {
 	}
 
 	public frmFirst() throws IOException {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("---Maze Runner---");
 		setBounds(100, 100, 1320, 756);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -62,6 +68,14 @@ public class frmFirst extends JFrame {
 		JLabel lblNewLabel = new JLabel("URL :");
 		lblNewLabel.setBounds(837, 43, 66, 28);
 		contentPane.add(lblNewLabel);
+
+		lblTime = new JLabel("  Solving Time :");
+		lblTime.setBounds(1054, 171, 218, 28);
+		contentPane.add(lblTime);
+
+		lblStep = new JLabel("  Step Number :");
+		lblStep.setBounds(1054, 292, 218, 28);
+		contentPane.add(lblStep);
 
 		JButton btnGo = new JButton("Go");
 		btnGo.addActionListener(new ActionListener() {
@@ -107,20 +121,17 @@ public class frmFirst extends JFrame {
 						}
 					}
 				}
-
 				for (int i = 0; i < arrayX; i++) {
 					for (int j = 0; j < arrayY; j++) {
 						absMaze[i + 1][j + 1] = maze[i][j];
 					}
 				}
-
 				for (int i = 0; i < arrayX + 2; i++) {
 					for (int j = 0; j < arrayY + 2; j++) {
 						System.out.print(absMaze[i][j]);
 					}
 					System.out.println();
 				}
-
 			}
 
 		});
@@ -130,6 +141,7 @@ public class frmFirst extends JFrame {
 		JButton btnNewButton = new JButton("Generate");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				m.getClear();
 				m.clear = false;
 				int width = absMaze[0].length;
 				int height = absMaze.length;
@@ -138,46 +150,33 @@ public class frmFirst extends JFrame {
 
 			}
 		});
-		btnNewButton.setBounds(878, 91, 101, 33);
+		btnNewButton.setBounds(878, 126, 101, 33);
 		contentPane.add(btnNewButton);
 
 		JButton btnStart = new JButton("Solve");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				m.running=true; 
-
+				m.running = true;
 			}
 		});
-		btnStart.setBounds(878, 149, 101, 33);
+		btnStart.setBounds(879, 257, 101, 33);
 		contentPane.add(btnStart);
 
-		JButton btnShowPath = new JButton("Show Path");
-		btnShowPath.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("dsffwfwqafwf");
-			}
-		});
-		btnShowPath.setBounds(878, 211, 101, 33);
-		contentPane.add(btnShowPath);
-
-
 		JButton btnClear = new JButton("Clear");
-		
-		btnClear.setBounds(878, 331, 101, 33);
+		btnClear.setBounds(879, 396, 101, 33);
 		contentPane.add(btnClear);
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
+
 				m.getClear();
-	
 			}
 		});
-		
+
 		JButton btnLogging = new JButton("Logging");
 		btnLogging.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				StringBuilder builder = new StringBuilder();
 
+				StringBuilder builder = new StringBuilder();
 				for (int i = 0; i < absMaze.length; i++) {
 					builder.append("{");
 					for (int j = 0; j < absMaze[0].length; j++) {
@@ -186,15 +185,30 @@ public class frmFirst extends JFrame {
 					builder.append("} ");
 					builder.append("\n");
 				}
+				builder.append("Step Number : " + m.road.size());
+				builder.append("\n");
+				for (Point is : m.road) {
+					builder.append("(" + is.x + "," + is.y + ")");
+					builder.append("\n");
+				}
+				builder.append("Solving Time : " + String.format("%.3f", m.time));
+				builder.append("\n");
 				String data = builder.toString();
 				Logging logging = new Logging();
 				logging.log(data);
 			}
 		});
-		btnLogging.setBounds(878, 273, 101, 33);
+		btnLogging.setBounds(879, 323, 101, 33);
 		contentPane.add(btnLogging);
 
-		
+		JButton btnClouding = new JButton("Clouding");
+		btnClouding.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				m.cloud = true;
+			}
+		});
+		btnClouding.setBounds(878, 198, 101, 33);
+		contentPane.add(btnClouding);
 
 	}
 }

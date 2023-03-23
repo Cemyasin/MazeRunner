@@ -28,16 +28,14 @@ public class frmMain extends JFrame {
 		});
 	}
 
-	
 	public frmMain() {
 		setLocationByPlatform(true);
 		setLocation(new Point(250, 250));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		setTitle("MAZE SOLVER");
+		setTitle("MAZE ALGORITHM");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
@@ -49,10 +47,8 @@ public class frmMain extends JFrame {
 					first = new frmFirst();
 					first.main(null);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
 			}
 		});
 		btnFirst.setBounds(107, 44, 204, 57);
@@ -64,7 +60,6 @@ public class frmMain extends JFrame {
 				frmSecond second;
 				second = new frmSecond();
 				second.main(null);
-				
 			}
 		});
 		btnSecond.setBounds(107, 140, 204, 57);
